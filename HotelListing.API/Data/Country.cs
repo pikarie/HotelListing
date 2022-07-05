@@ -9,6 +9,6 @@ namespace HotelListing.API.Data
 		[MaxLength(3)]
 		public string Alpha3Code { get; set; }
 
-		public virtual IList<Hotel> Hotels { get; set; }
+		public virtual ICollection<Hotel>? Hotels { get; set; }
 	}
 }
