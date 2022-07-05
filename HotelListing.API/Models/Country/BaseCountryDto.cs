@@ -6,6 +6,7 @@ namespace HotelListing.API.Models.Country
 	{
 		[Required]
 		public string Name { get; set; }
+
 		[MaxLength(3)]
 		public string Alpha3Code { get; set; }
 	}
