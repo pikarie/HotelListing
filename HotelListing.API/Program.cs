@@ -5,6 +5,7 @@ using HotelListing.API.Middlewares;
 using HotelListing.API.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -40,6 +41,25 @@ builder.Services.AddCors(options =>
 	);
 });
 
+builder.Services.AddApiVersioning(options =>
+{
+	options.AssumeDefaultVersionWhenUnspecified = true;
+	options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+	options.ReportApiVersions = true;
+	options.ApiVersionReader = ApiVersionReader.Combine(
+		new QueryStringApiVersionReader("api-version"),
+		new HeaderApiVersionReader("X-Version"),
+		new MediaTypeApiVersionReader("ver")
+	);
+});
+
+builder.Services.AddVersionedApiExplorer(
+	options =>
+	{
+		options.GroupNameFormat = "'v'VVV";
+		options.SubstituteApiVersionInUrl = true;
+	});
+
 builder.Host.UseSerilog((context, loggerConfiguration) => loggerConfiguration.WriteTo.Console().ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddAutoMapper(typeof(AutomapperConfig));
@@ -53,7 +73,8 @@ builder.Services.AddAuthentication(options =>
 {
 	options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // "Bearer"
 	options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options => {
+}).AddJwtBearer(options =>
+{
 	options.TokenValidationParameters = new TokenValidationParameters
 	{
 		ValidateIssuerSigningKey = true,

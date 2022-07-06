@@ -14,8 +14,10 @@ using HotelListing.API.Exceptions;
 
 namespace HotelListing.API.Controllers
 {
-	[Route("api/[controller]")]
 	[ApiController]
+	[Route("api/[controller]")]
+	//[Route("v{version:apiVersion}/[controller]")]
+	[ApiVersion("1.0")]
 	public class CountriesController : ControllerBase
 	{
 		private readonly IMapper _mapper;
