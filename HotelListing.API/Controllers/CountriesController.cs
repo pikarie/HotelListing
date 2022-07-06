@@ -10,6 +10,7 @@ using AutoMapper;
 using HotelListing.API.Models.Country;
 using HotelListing.API.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using HotelListing.API.Exceptions;
 
 namespace HotelListing.API.Controllers
 {
@@ -45,6 +46,7 @@ namespace HotelListing.API.Controllers
 
 			if (country == null)
 			{
+				throw new NotFoundException(nameof(GetCountry), id);
 				_logger.LogWarning("Record not found in {NameOfMethod} with id {Id}.", nameof(GetCountry), id);
 				return NotFound();
 			}
