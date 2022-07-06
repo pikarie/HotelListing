@@ -45,7 +45,7 @@ namespace HotelListing.API.Controllers
 
 			if (country == null)
 			{
-				_logger.LogWarning("Record not found in {NameOfMethod} with id {Id}.", nameof(GetCountry), id)
+				_logger.LogWarning("Record not found in {NameOfMethod} with id {Id}.", nameof(GetCountry), id);
 				return NotFound();
 			}
 
