@@ -10,10 +10,12 @@ namespace HotelListing.API.Controllers
 	public class AuthenticationController : ControllerBase
 	{
 		private readonly IAuthManager _authManager;
+		private readonly ILogger<AuthenticationController> _logger;
 
-		public AuthenticationController(IAuthManager authManager)
+		public AuthenticationController(IAuthManager authManager, ILogger<AuthenticationController> logger)
 		{
-			this._authManager = authManager;
+			_authManager = authManager;
+			_logger = logger;
 		}
 
 		// POST: api/Authentication/register-admin
@@ -24,18 +26,28 @@ namespace HotelListing.API.Controllers
 		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 		public async Task<ActionResult> RegisterAdmin(ApiUserDto apiUserDto)
 		{
-			var errors = await _authManager.RegisterWithAdminRole(apiUserDto);
-
-			if (errors.Any())
+			try
 			{
-				foreach (var error in errors)
-				{
-					ModelState.AddModelError(error.Code, error.Description);
-				}
-				return BadRequest(ModelState);
-			}
+				var errors = await _authManager.RegisterWithAdminRole(apiUserDto);
 
-			return Ok();
+				if (errors.Any())
+				{
+					foreach (var error in errors)
+					{
+						ModelState.AddModelError(error.Code, error.Description);
+					}
+					return BadRequest(ModelState);
+				}
+
+				return Ok();
+			}
+			catch (Exception e)
+			{
+				_logger.LogError(e, "An exception occurred in method {NameOfMethod} for user with email {Email}.",
+					nameof(RegisterAdmin), apiUserDto.Email);
+				return Problem($"An exception occurred in method {nameof(RegisterAdmin)} for user with email {apiUserDto.Email}. Please contact support.",
+					statusCode: StatusCodes.Status500InternalServerError);
+			}
 		}
 
 		// POST: api/Authentication/register
@@ -46,18 +58,28 @@ namespace HotelListing.API.Controllers
 		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 		public async Task<ActionResult> Register(ApiUserDto apiUserDto)
 		{
-			var errors = await _authManager.RegisterWithUserRole(apiUserDto);
-
-			if (errors.Any())
+			try
 			{
-				foreach (var error in errors)
-				{
-					ModelState.AddModelError(error.Code, error.Description);
-				}
-				return BadRequest(ModelState);
-			}
+				var errors = await _authManager.RegisterWithUserRole(apiUserDto);
 
-			return Ok();
+				if (errors.Any())
+				{
+					foreach (var error in errors)
+					{
+						ModelState.AddModelError(error.Code, error.Description);
+					}
+					return BadRequest(ModelState);
+				}
+
+				return Ok();
+			}
+			catch (Exception e)
+			{
+				_logger.LogError(e, "An exception occurred in method {NameOfMethod} for user with email {Email}.",
+					nameof(Register), apiUserDto.Email);
+				return Problem($"An exception occurred in method {nameof(Register)} for user with email {apiUserDto.Email}. Please contact support.",
+					statusCode: StatusCodes.Status500InternalServerError);
+			}
 		}
 
 		// POST: api/Authentication/login
@@ -67,14 +89,24 @@ namespace HotelListing.API.Controllers
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public async Task<ActionResult<AuthResponseDto>> Login(LoginDto loginDto)
 		{
-			var authResponseDto = await _authManager.Login(loginDto);
+			try
+			{
+				var authResponseDto = await _authManager.Login(loginDto);
 
-			if (authResponseDto == null)
-			{ 
-				return Unauthorized();
+				if (authResponseDto == null)
+				{
+					return Unauthorized();
+				}
+
+				return Ok(authResponseDto);
 			}
-
-			return Ok(authResponseDto);
+			catch (Exception e)
+			{
+				_logger.LogError(e, "An exception occurred in method {NameOfMethod} for user with email {Email}.",
+					nameof(Login), loginDto.Email);
+				return Problem($"An exception occurred in method {nameof(Login)} for user with email {loginDto.Email}. Please contact support.",
+					statusCode: StatusCodes.Status500InternalServerError);
+			}
 		}
 
 		// POST: api/Authentication/refreshToken
@@ -84,14 +116,24 @@ namespace HotelListing.API.Controllers
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public async Task<ActionResult<AuthResponseDto>> RefreshToken(AuthResponseDto authResponseDto)
 		{
-			var authResponseDtoResult = await _authManager.VerifyRefreshToken(authResponseDto);
-
-			if (authResponseDtoResult == null)
+			try
 			{
-				return Unauthorized();
-			}
+				var authResponseDtoResult = await _authManager.VerifyRefreshToken(authResponseDto);
 
-			return Ok(authResponseDtoResult);
+				if (authResponseDtoResult == null)
+				{
+					return Unauthorized();
+				}
+
+				return Ok(authResponseDtoResult);
+			}
+			catch (Exception e)
+			{
+				_logger.LogError(e, "An exception occurred in method {NameOfMethod} for user id {UserId}.",
+					nameof(RefreshToken), authResponseDto.UserId);
+				return Problem($"An exception occurred in method {nameof(RefreshToken)} for user id {authResponseDto.UserId}. Please contact support.",
+					statusCode: StatusCodes.Status500InternalServerError);
+			}
 		}
 	}
 }
