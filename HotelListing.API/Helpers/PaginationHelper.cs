@@ -1,6 +1,6 @@
-﻿using HotelListing.API.Contracts;
-using HotelListing.API.Models.Filter;
-using HotelListing.API.Models.Wrappers;
+﻿using HotelListing.Core.Contracts;
+using HotelListing.Core.Models.Filter;
+using HotelListing.Core.Models.Wrappers;
 
 namespace HotelListing.API.Helpers
 {
