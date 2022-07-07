@@ -19,7 +19,18 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("HotelListingDbConnectionString");
 builder.Services.AddDbContext<HotelListingDbContext>(options =>
 {
-	options.UseSqlServer(connectionString);
+	options.UseSqlServer(
+		connectionString,
+		b => b.MigrationsAssembly(typeof(HotelListingDbContext).Assembly.FullName)
+		);
+});
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IUriService>(o =>
+{
+	var accessor = o.GetRequiredService<IHttpContextAccessor>();
+	var request = accessor.HttpContext.Request;
+	var uri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
+	return new UriService(uri);
 });
 
 builder.Services.AddIdentityCore<ApiUser>()
@@ -68,7 +79,7 @@ builder.Services.AddAutoMapper(typeof(AutomapperConfig));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
 builder.Services.AddScoped<IHotelsRepository, HotelRepository>();
-builder.Services.AddScoped<IAuthManager, AuthManager>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -118,7 +129,7 @@ app.Use(async (context, next) =>
 	new CacheControlHeaderValue()
 	{
 		Public = true,
-		MaxAge = TimeSpan.FromSeconds(10)
+		MaxAge = TimeSpan.FromSeconds(1)//5
 	};
 	context.Response.Headers[HeaderNames.Vary] = new string[] { "Accept-Encoding" };
 

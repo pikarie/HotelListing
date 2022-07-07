@@ -1,5 +1,9 @@
-﻿using HotelListing.API.Contracts;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using HotelListing.API.Contracts;
 using HotelListing.API.Data;
+using HotelListing.API.Models.Filter;
+using HotelListing.API.Models.Wrappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.API.Repositories
@@ -7,15 +11,51 @@ namespace HotelListing.API.Repositories
 	public class GenericRepository<T> : IGenericRepository<T> where T : class
 	{
 		private readonly HotelListingDbContext _context;
+		private readonly IMapper _mapper;
 
-		public GenericRepository(HotelListingDbContext context)
+		public GenericRepository(HotelListingDbContext context, IMapper mapper)
 		{
 			_context = context;
+			_mapper = mapper;
+		}
+
+		public async Task<List<T>> GetAllAsync()
+		{
+			return await _context.Set<T>().ToListAsync();
+		}
+
+		public async Task<List<TResult>> GetAllAsync<TResult>(PaginationFilter filter)
+		{
+			var totalRecords = await _context.Set<T>().CountAsync();
+			var items = await _context.Set<T>()
+				.Skip((filter.PageNumber - 1) * filter.PageSize)
+				.Take(filter.PageSize)
+				.ProjectTo<TResult>(_mapper.ConfigurationProvider)
+				.ToListAsync();
+
+			return items;
+		}
+
+		public async Task<T> GetAsync(int? id)
+		{
+			if (id is null)
+			{
+				return null;
+			}
+
+			return await _context.Set<T>().FindAsync(id);
 		}
 
 		public async Task<T> AddAsync(T entity)
 		{
 			await _context.AddAsync(entity);
+			await _context.SaveChangesAsync();
+			return entity;
+		}
+
+		public async Task<T> UpdateAsync(T entity)
+		{
+			_context.Update(entity);
 			await _context.SaveChangesAsync();
 			return entity;
 		}
@@ -33,26 +73,9 @@ namespace HotelListing.API.Repositories
 			return entity != null;
 		}
 
-		public async Task<List<T>> GetAllAsync()
+		public async Task<int> GetCountAsync()
 		{
-			return await _context.Set<T>().ToListAsync();
-		}
-
-		public async Task<T> GetAsync(int? id)
-		{
-			if (id is null)
-			{
-				return null;
-			}
-
-			return await _context.Set<T>().FindAsync(id);
-		}
-
-		public async Task<T> UpdateAsync(T entity)
-		{
-			_context.Update(entity);
-			await _context.SaveChangesAsync();
-			return entity;
+			return await _context.Set<T>().CountAsync();
 		}
 	}
 }

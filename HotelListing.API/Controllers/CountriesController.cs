@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using HotelListing.API.Contracts;
+using HotelListing.API.Data;
+using HotelListing.API.Exceptions;
+using HotelListing.API.Helpers;
+using HotelListing.API.Models.Country;
+using HotelListing.API.Models.Filter;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using HotelListing.API.Data;
-using AutoMapper;
-using HotelListing.API.Models.Country;
-using HotelListing.API.Contracts;
-using Microsoft.AspNetCore.Authorization;
-using HotelListing.API.Exceptions;
 
 namespace HotelListing.API.Controllers
 {
@@ -20,15 +17,17 @@ namespace HotelListing.API.Controllers
 	[ApiVersion("1.0")]
 	public class CountriesController : ControllerBase
 	{
+		private readonly ILogger<CountriesController> _logger;
 		private readonly IMapper _mapper;
 		private readonly ICountriesRepository _countriesRepository;
-		private readonly ILogger<CountriesController> _logger;
+		private readonly IUriService _uriService;
 
-		public CountriesController(IMapper mapper, ICountriesRepository countriesRepository, ILogger<CountriesController> logger)
+		public CountriesController(ILogger<CountriesController> logger, IMapper mapper, ICountriesRepository countriesRepository, IUriService uriService)
 		{
+			_logger = logger;
 			_mapper = mapper;
 			_countriesRepository = countriesRepository;
-			_logger = logger;
+			this._uriService = uriService;
 		}
 
 		// GET: api/Countries
@@ -40,6 +39,19 @@ namespace HotelListing.API.Controllers
 			return Ok(countriesDto);
 		}
 
+		// GET: api/Countries/paged?PageNumber=1&PageSize=8
+		[HttpGet("paged")]
+		public async Task<ActionResult> GetPagedCountries([FromQuery] PaginationFilter filter)
+		{
+			var route = Request.Path.Value;
+			var validFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+			var pagedCountries = await _countriesRepository.GetAllAsync<GetCountryDto>(validFilter);
+			var totalRecords = await _countriesRepository.GetCountAsync();
+			var pagedResponse = PaginationHelper.CreatePagedReponse(_mapper.Map<List<Country>>(pagedCountries), validFilter, totalRecords, _uriService, route);
+
+			return Ok(pagedResponse);
+		}
+
 		// GET: api/Countries/5
 		[HttpGet("{id}")]
 		public async Task<ActionResult<CountryDto>> GetCountry(int id)
@@ -49,8 +61,8 @@ namespace HotelListing.API.Controllers
 			if (country == null)
 			{
 				throw new NotFoundException(nameof(GetCountry), id);
-				_logger.LogWarning("Record not found in {NameOfMethod} with id {Id}.", nameof(GetCountry), id);
-				return NotFound();
+				//_logger.LogWarning("Record not found in {NameOfMethod} with id {Id}.", nameof(GetCountry), id);
+				//return NotFound();
 			}
 
 			var countryDto = _mapper.Map<CountryDto>(country);

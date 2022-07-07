@@ -9,10 +9,10 @@ namespace HotelListing.API.Controllers
 	[ApiController]
 	public class AuthenticationController : ControllerBase
 	{
-		private readonly IAuthManager _authManager;
+		private readonly IAuthService _authManager;
 		private readonly ILogger<AuthenticationController> _logger;
 
-		public AuthenticationController(IAuthManager authManager, ILogger<AuthenticationController> logger)
+		public AuthenticationController(IAuthService authManager, ILogger<AuthenticationController> logger)
 		{
 			_authManager = authManager;
 			_logger = logger;

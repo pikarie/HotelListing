@@ -10,12 +10,12 @@ using System.Text;
 
 namespace HotelListing.API.Repositories
 {
-	public class AuthManager : IAuthManager
+	public class AuthService : IAuthService
 	{
 		private readonly IMapper _mapper;
 		private readonly UserManager<ApiUser> _userManager;
 		private readonly IConfiguration _configuration;
-		private readonly ILogger<AuthManager> _logger;
+		private readonly ILogger<AuthService> _logger;
 		private readonly string roleAdmin = "Administrator";
 		private readonly string roleUser = "User";
 		private readonly string loginProvider = "HotelListingApi";
@@ -23,7 +23,7 @@ namespace HotelListing.API.Repositories
 
 		private ApiUser user;
 
-		public AuthManager(IMapper mapper, UserManager<ApiUser> userManager, IConfiguration configuration, ILogger<AuthManager> logger)
+		public AuthService(IMapper mapper, UserManager<ApiUser> userManager, IConfiguration configuration, ILogger<AuthService> logger)
 		{
 			_mapper = mapper;
 			_userManager = userManager;
