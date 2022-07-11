@@ -1,0 +1,346 @@
+{
+	"info": {
+		"_postman_id": "1ae10a13-0a3a-4450-b2ba-c4d0978f0e4b",
+		"name": "Hotel Listing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Countries",
+			"item": [
+				{
+					"name": "all countries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/countries"
+					},
+					"response": []
+				},
+				{
+					"name": "all countries with OData",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/countries?orderBy=Name",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"countries"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "Name",
+									"disabled": true
+								},
+								{
+									"key": "select",
+									"value": "Name,Alpha3Code",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "Name eq 'Australia'",
+									"disabled": true
+								},
+								{
+									"key": "orderBy",
+									"value": "Name"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all countries paged",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/countries/paged?PageNumber=1&PageSize=2",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"countries",
+								"paged"
+							],
+							"query": [
+								{
+									"key": "PageNumber",
+									"value": "1"
+								},
+								{
+									"key": "PageSize",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "country by id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Version",
+								"value": "1",
+								"type": "default",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{server}}/countries/1",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"countries",
+								"1"
+							],
+							"query": [
+								{
+									"key": "api-version",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "country",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"NewCountry\",\r\n  \"alpha3Code\": \"NCT\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/countries"
+					},
+					"response": []
+				},
+				{
+					"name": "country",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": 4,\r\n  \"name\": \"Norway\",\r\n  \"alpha3Code\": \"NOR\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/countries/4"
+					},
+					"response": []
+				},
+				{
+					"name": "country",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": 4,\r\n  \"name\": \"Norway\",\r\n  \"alpha3Code\": \"NOR\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/countries/16"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Hotels",
+			"item": [
+				{
+					"name": "all hotels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/hotels"
+					},
+					"response": []
+				},
+				{
+					"name": "hotel by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/hotels/1"
+					},
+					"response": []
+				},
+				{
+					"name": "hotel",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Hotel Nikko Osaka (ホテル日航大阪)\",\r\n  \"address\": \"1 Chome-3-3 Nishishinsaibashi, Chuo Ward, Osaka, 542-0086, Japan\",\r\n  \"rating\": 4.1,\r\n  \"countryId\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/hotels"
+					},
+					"response": []
+				},
+				{
+					"name": "hotel",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Hotel Nikko Osaka (ホテル日航大阪)\",\r\n  \"address\": \"1 Chome-3-3 Nishishinsaibashi, Chuo Ward, Osaka, 542-0086, Japan\",\r\n  \"rating\": 4.1,\r\n  \"countryId\": 2,\r\n  \"id\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/hotels/5"
+					},
+					"response": []
+				},
+				{
+					"name": "hotel",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{server}}/hotels/4"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"admin@example.com\",\r\n  \"password\": \"Admin#1#\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/authentication/login"
+					},
+					"response": []
+				},
+				{
+					"name": "refresh token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": \"4f206dd2-add2-4f40-8d4b-178543215b82\",\r\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImp0aSI6IjgwMjQyZjZkLWUwNGUtNGNmZS05ZGJhLWQwYmYzMDhlYWNjMiIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJ1aWQiOiI0ZjIwNmRkMi1hZGQyLTRmNDAtOGQ0Yi0xNzg1NDMyMTViODIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOlsiQWRtaW5pc3RyYXRvciIsIlVzZXIiXSwiZXhwIjoxNjU3MTM2NjU0LCJpc3MiOiJIb3RlbExpc3RpbmdBUEkiLCJhdWQiOiJIb3RlbExpc3RpbmdBUElDbGllbnQifQ.NUHwemDMVuk4FHdjct8ztsHwS0ogXPmDcG78C7Gf1m0\",\r\n  \"refreshToken\": \"CfDJ8LDxUhTXa/pIlWuYBfuzoFxRUsUQi39M7bQuUFIDJDYcw8AWDVkBJLa7LuVO8JdUslUybZjJtbkhQap1VI0M6UVh3ZfzU9sAiao9EeUx6O5A2yQTUnoGGvNewa0gyPZ0mBIGcKn0MJAu4BgYoA13UOmxG42fFxM+DABtNEdTWdQChH+ZuHOC9OMkjjbejonoO+8sJO2ajy0v6/Np69wHnkt0YSiXdq5nsVE4JfvKRpiZ\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/authentication/refreshToken"
+					},
+					"response": []
+				},
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"admin\",\r\n  \"lastName\": \"admin\",\r\n  \"email\": \"admin@example.com\",\r\n  \"password\": \"Admin#1#\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/authentication/register"
+					},
+					"response": []
+				},
+				{
+					"name": "register admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"admin\",\r\n  \"lastName\": \"admin\",\r\n  \"email\": \"admin2@example.com\",\r\n  \"password\": \"Admin#2#\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/authentication/registerAdmin"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{token}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
