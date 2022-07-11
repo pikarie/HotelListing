@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using HotelListing.Core.Contracts;
+using HotelListing.Core.Exceptions;
 using HotelListing.Core.Models.Filter;
 using HotelListing.Data;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,13 @@ namespace HotelListing.Core.Repositories
 			return items;
 		}
 
+		public async Task<List<TResult>> GetAllAsync<TResult>()
+		{
+			return await _context.Set<T>()
+				.ProjectTo<TResult>(_mapper.ConfigurationProvider)
+				.ToListAsync();
+		}
+
 		public async Task<T> GetAsync(int? id)
 		{
 			if (id is null)
@@ -45,11 +53,40 @@ namespace HotelListing.Core.Repositories
 			return await _context.Set<T>().FindAsync(id);
 		}
 
+		public async Task<TResult> GetAsync<TResult>(int? id)
+		{
+			var result = await _context.Set<T>().FindAsync(id);
+
+			if (result is null)
+			{
+				throw new NotFoundException(typeof(T).Name, id.HasValue ? id : "invalid id");
+			}
+
+			return _mapper.Map<TResult>(result);
+		}
+
 		public async Task<T> AddAsync(T entity)
 		{
 			await _context.AddAsync(entity);
 			await _context.SaveChangesAsync();
 			return entity;
+		}
+
+		/// <summary>
+		/// "T" would be the entity, e.g. Hotel
+		/// </summary>
+		/// <typeparam name="TSource">A dto, e.g. CreateHotelDto</typeparam>
+		/// <typeparam name="TResult">A dto, e.g. HotelDto</typeparam>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		public async Task<TResult> AddAsync<TSource, TResult>(TSource source)
+		{
+			var entity = _mapper.Map<T>(source);
+
+			await _context.AddAsync(entity);
+			await _context.SaveChangesAsync();
+
+			return _mapper.Map<TResult>(entity);
 		}
 
 		public async Task<T> UpdateAsync(T entity)
@@ -59,9 +96,29 @@ namespace HotelListing.Core.Repositories
 			return entity;
 		}
 
+		public async Task UpdateAsync<TSource>(int id, TSource source)
+		{
+			var entity = await GetAsync(id);
+
+			if (entity == null)
+			{
+				throw new NotFoundException(typeof(T).Name, id);
+			}
+
+			_mapper.Map(source, entity);
+			_context.Update(entity);
+			await _context.SaveChangesAsync();
+		}
+
 		public async Task DeleteAsync(int id)
 		{
 			var entity = await GetAsync(id);
+
+			if (entity is null)
+			{
+				throw new NotFoundException(typeof(T).Name, id);
+			}
+
 			_context.Set<T>().Remove(entity);
 			await _context.SaveChangesAsync();
 		}
